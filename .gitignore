@@ -1,0 +1,8 @@
+# Game installer binary (~700MB)
+*.exe
+
+# macOS
+.DS_Store
+
+# Wine prefix (created at install time)
+*.reg
