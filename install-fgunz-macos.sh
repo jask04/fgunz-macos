@@ -220,6 +220,21 @@ if [[ ! -d "$WINEPREFIX" ]]; then
         "HKEY_CURRENT_USER\\Software\\Wine\\Direct3D" \
         /v CheckFloatConstants /t REG_SZ /d "disabled" /f 2>/dev/null
 
+    # Disable strict draw ordering — allows batching draw calls more aggressively
+    WINEPREFIX="$WINEPREFIX" wine64 reg add \
+        "HKEY_CURRENT_USER\\Software\\Wine\\Direct3D" \
+        /v StrictDrawOrdering /t REG_DWORD /d 0 /f 2>/dev/null
+
+    # Disable multisampling (game doesn't need it, reduces GPU overhead)
+    WINEPREFIX="$WINEPREFIX" wine64 reg add \
+        "HKEY_CURRENT_USER\\Software\\Wine\\Direct3D" \
+        /v SampleCount /t REG_DWORD /d 0 /f 2>/dev/null
+
+    # FBO offscreen rendering (most efficient on macOS)
+    WINEPREFIX="$WINEPREFIX" wine64 reg add \
+        "HKEY_CURRENT_USER\\Software\\Wine\\Direct3D" \
+        /v OffScreenRenderingMode /t REG_SZ /d "fbo" /f 2>/dev/null
+
     # Prevent macOS from capturing displays on fullscreen transitions
     print_info "Configuring Mac Driver settings..."
     WINEPREFIX="$WINEPREFIX" wine64 reg add \
