@@ -6,3 +6,6 @@
 
 # Wine prefix (created at install time)
 *.reg
+
+# Profiling output (generated per-run, not committed)
+tools/profiles/
