@@ -300,11 +300,11 @@ LAUNCH_TIME=$(date +%s)
 if [[ "$WINE_DEBUG" != "-all" ]]; then
     echo -e "${YELLOW}Wine debug channels enabled — expect slower performance and large log files.${NC}"
     echo ""
-    wine64 explorer /desktop=FGunZ,1440x900 \
+    wine64 explorer /desktop=FGunZ,1920x1080 \
         "C:\Program Files (x86)\Freestyle GunZ\launch.bat" \
         2>"$PROFILE_DIR/wine-debug.log"
 else
-    wine64 explorer /desktop=FGunZ,1440x900 \
+    wine64 explorer /desktop=FGunZ,1920x1080 \
         "C:\Program Files (x86)\Freestyle GunZ\launch.bat" \
         2>/dev/null
 fi

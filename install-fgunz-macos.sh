@@ -220,12 +220,19 @@ if [[ ! -d "$WINEPREFIX" ]]; then
         "HKEY_CURRENT_USER\\Software\\Wine\\Direct3D" \
         /v CheckFloatConstants /t REG_SZ /d "disabled" /f 2>/dev/null
 
-    # Virtual desktop — prevents window minimize on screen transitions (device resets)
-    # Using registry instead of explorer /desktop= wrapper to preserve working directory
-    print_info "Configuring virtual desktop (prevents focus loss on transitions)..."
+    # Prevent macOS from capturing displays on fullscreen transitions
+    print_info "Configuring Mac Driver settings..."
     WINEPREFIX="$WINEPREFIX" wine64 reg add \
-        "HKEY_CURRENT_USER\\Software\\Wine\\Explorer\\Desktops" \
-        /v Default /t REG_SZ /d "1280x720" /f 2>/dev/null
+        "HKEY_CURRENT_USER\\Software\\Wine\\Mac Driver" \
+        /v CaptureDisplaysForFullscreen /t REG_SZ /d "n" /f 2>/dev/null
+
+    # Use native d3dx9_43 — Wine's builtin fails to decompress DXT textures,
+    # causing character skins to render as flat gray. The game ships its own
+    # native Microsoft D3DX9_43.dll which handles DDS textures correctly.
+    print_info "Setting D3DX9 to use native DLL (fixes character skin rendering)..."
+    WINEPREFIX="$WINEPREFIX" wine64 reg add \
+        "HKEY_CURRENT_USER\\Software\\Wine\\DllOverrides" \
+        /v d3dx9_43 /t REG_SZ /d "native,builtin" /f 2>/dev/null
 
     print_info "Wine prefix created."
 fi
@@ -351,6 +358,12 @@ cat > "$LAUNCH_BAT" << 'BATEOF'
 @echo off
 cd /d "%~dp0"
 Launcher.exe %*
+:waitloop
+tasklist /fi "imagename eq Gunz.exe" 2>nul | find /i "Gunz.exe" >nul
+if %errorlevel%==0 (
+    timeout /t 2 /nobreak >nul
+    goto waitloop
+)
 BATEOF
 print_info "Created launch.bat wrapper in game directory."
 
@@ -369,7 +382,7 @@ cat > "$LAUNCH_SCRIPT" << EOF
 export WINEPREFIX="\$HOME/Games/freestyle-gunz"
 export WINEDEBUG=-all
 
-wine64 explorer /desktop=FGunZ,1440x900 "$GAME_DIR_WIN\\launch.bat" "\$@"
+wine64 explorer /desktop=FGunZ,1920x1080 "$GAME_DIR_WIN\\launch.bat" "\$@"
 EOF
 
 chmod +x "$LAUNCH_SCRIPT"
@@ -393,7 +406,7 @@ cat > "$APP_DIR/Contents/MacOS/launch" << EOF
 export WINEPREFIX="\$HOME/Games/freestyle-gunz"
 export WINEDEBUG=-all
 
-wine64 explorer /desktop=FGunZ,1440x900 "$GAME_DIR_WIN\\launch.bat" "\$@"
+wine64 explorer /desktop=FGunZ,1920x1080 "$GAME_DIR_WIN\\launch.bat" "\$@"
 EOF
 chmod +x "$APP_DIR/Contents/MacOS/launch"
 
