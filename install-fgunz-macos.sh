@@ -422,23 +422,6 @@ print_info "App bundle created at: $APP_DIR"
 print_info "You can find 'Freestyle GunZ' in ~/Applications or via Spotlight."
 
 # =============================================================================
-# Step 9: Apply macOS performance optimizations to game config
-# =============================================================================
-print_step "Step 9: Applying macOS performance optimizations"
-
-CONFIG_FILE="$GAME_DIR/config.xml"
-if [[ -f "$CONFIG_FILE" ]]; then
-    # Enable dynamic loading — loads textures on-demand instead of all upfront.
-    # Dramatically reduces the "Loading Pictures" wait time on macOS.
-    if grep -q "<DYNAMICLOADING>FALSE</DYNAMICLOADING>" "$CONFIG_FILE"; then
-        sed -i '' 's/<DYNAMICLOADING>FALSE<\/DYNAMICLOADING>/<DYNAMICLOADING>TRUE<\/DYNAMICLOADING>/' "$CONFIG_FILE"
-        print_info "Enabled dynamic loading (faster startup)."
-    fi
-else
-    print_warning "config.xml not found — skipping optimization. Launch the game once to generate it."
-fi
-
-# =============================================================================
 # Done!
 # =============================================================================
 echo ""

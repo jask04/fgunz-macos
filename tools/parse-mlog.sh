@@ -116,7 +116,9 @@ GAME_CREATED=$(grep -o 'game created ( [^)]*)'  "$MLOG_PATH" | head -1 | grep -o
 GAME_DESTROYED=$(grep -o 'game destroyed ( [^)]*)' "$MLOG_PATH" | head -1 | grep -oE '[0-9]{2}:[0-9]{2}:[0-9]{2}')
 
 # -- Detect crashes --
-HAS_CRASH=$(grep -c '\[Exception\]\|ExpCode\|Crash' "$MLOG_PATH" 2>/dev/null || echo "0")
+HAS_CRASH=$(grep -c '\[Exception\]\|ExpCode\|Crash' "$MLOG_PATH" 2>/dev/null || true)
+HAS_CRASH="${HAS_CRASH:-0}"
+HAS_CRASH=$(echo "$HAS_CRASH" | tr -d '[:space:]')
 
 # -- Helper: format seconds as human-readable --
 format_time() {

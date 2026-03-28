@@ -116,21 +116,9 @@ done
 get_time() {
     local json_file="$1"
     local phase="$2"
-    # Extract seconds for the matching phase
+    # Each phase is on one line: {"name": "Phase Name", "seconds": 123.456}
     local result
-    result=$(awk -v phase="$phase" '
-        /"name":/ {
-            gsub(/.*"name": "/, "")
-            gsub(/".*/, "")
-            name = $0
-        }
-        /"seconds":/ && name == phase {
-            gsub(/.*"seconds": /, "")
-            gsub(/[,}].*/, "")
-            print $0
-            exit
-        }
-    ' "$json_file")
+    result=$(grep "\"name\": \"$phase\"" "$json_file" | sed 's/.*"seconds": //' | sed 's/[,}].*//' | tr -d ' ')
     echo "${result:-0}"
 }
 
